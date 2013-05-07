@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
 # Name:         sfdb
 # Purpose:      Common functions for working with the database back-end.
@@ -79,12 +80,9 @@ class SpiderFootDb:
 
     # Generate an globally unique ID for this scan
     def scanInstanceGenGUID(self, scanName):
-        hashStr = hashlib.sha256(
-                scanName +
-                str(time.time() * 1000) +
-                str(random.randint(100000, 999999))
-            ).hexdigest()
-        return hashStr
+        hashStr = "{0}-{1}_{2}".format( scanName, (time.time() * 1000), random.randint(100000, 999999) )
+        hashStrBytes = hashStr.encode('utf-8')
+        return hashlib.sha256( hashStrBytes ).hexdigest()
 
     # Store a scan instance
     def scanInstanceCreate(self, instanceId, scanName, scanTarget):

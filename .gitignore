@@ -11,4 +11,4 @@
 
 # App files
 spiderfoot.db
-
+__pycache__/
