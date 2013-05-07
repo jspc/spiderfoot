@@ -46,7 +46,7 @@ class sfp_googlesearch(SpiderFootPlugin):
         self.baseDomain = target
         self.results = list()
 
-        for opt in userOpts.keys():
+        for opt in list(userOpts.keys()):
             self.opts[opt] = userOpts[opt]
 
     # What events is this module interested in for input
@@ -64,7 +64,7 @@ class sfp_googlesearch(SpiderFootPlugin):
         fetches = 0
         returnResults = dict()
 
-        if opts.has_key('limit'):
+        if 'limit' in opts:
             limit = opts['limit']
 
         # We attempt to make the URL look as authentically human as possible
@@ -96,7 +96,7 @@ class sfp_googlesearch(SpiderFootPlugin):
             sf.info("Next Google URL: " + nextUrl)
 
             # Wait for a random number of seconds between fetches
-            if not opts.has_key('nopause'):
+            if 'nopause' not in opts:
                 pauseSecs = random.randint(4, 15)
                 sf.info("Pausing for " + str(pauseSecs))
                 time.sleep(pauseSecs)
@@ -126,7 +126,7 @@ class sfp_googlesearch(SpiderFootPlugin):
             sf.info("No results returned from Google.")
             return None
 
-        for page in pages.keys():
+        for page in list(pages.keys()):
             if page in self.results:
                 continue
 

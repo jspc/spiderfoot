@@ -74,7 +74,7 @@ class sfp_similar(SpiderFootPlugin):
         self.baseDomain = target
         self.results = list()
 
-        for opt in userOpts.keys():
+        for opt in list(userOpts.keys()):
             self.opts[opt] = userOpts[opt]
 
     def findDomains(self, keyword, content):

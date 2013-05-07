@@ -37,7 +37,7 @@ class sfp_stor_db(SpiderFootPlugin):
 
         sf = sfc
 
-        for opt in userOpts.keys():
+        for opt in list(userOpts.keys()):
             self.opts[opt] = userOpts[opt]
 
         # Use the database handle passed to us
@@ -55,12 +55,12 @@ class sfp_stor_db(SpiderFootPlugin):
         
         # If we get passed a dict or list, convert it to a string first, as
         # those types do not have a unicode converter.
-        if type(sfEvent.data) not in [unicode, str]:
+        if type(sfEvent.data) not in [str, str]:
             sfEvent.data = str(sfEvent.data)
 
         # Convert to a string in case we get passed integers or other things
-        if type(sfEvent.data) is not unicode:
-            sfEvent.data = unicode(sfEvent.data, 'utf-8', errors='ignore')
+        if type(sfEvent.data) is not str:
+            sfEvent.data = str(sfEvent.data, 'utf-8', errors='ignore')
 
         if self.opts['maxstorage'] != 0:
             if len(sfEvent.data) > self.opts['maxstorage']:

@@ -45,7 +45,7 @@ class sfp_mail(SpiderFootPlugin):
         self.baseDomain = target
         self.results = dict()
 
-        for opt in userOpts.keys():
+        for opt in list(userOpts.keys()):
             self.opts[opt] = userOpts[opt]
 
     # What events is this module interested in for input
@@ -73,7 +73,7 @@ class sfp_mail(SpiderFootPlugin):
                 sf.debug("E-mail (or something) from somewhere else..")
                 continue
 
-            if self.results.has_key(match):
+            if match in self.results:
                 sf.debug("Already found, skipping.")
                 continue
             else:

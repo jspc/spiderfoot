@@ -13,7 +13,7 @@ import threading
 import traceback
 import os
 import time
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 import sys
 from copy import deepcopy
 from sfdb import SpiderFootDb
@@ -50,7 +50,7 @@ class SpiderFootScanner:
         if self.moduleInstances == None:
             return None
 
-        for modName in self.moduleInstances.keys():
+        for modName in list(self.moduleInstances.keys()):
             self.moduleInstances[modName].stopScanning()
 
     # Start running a scan
@@ -94,7 +94,7 @@ class SpiderFootScanner:
                 # Configuration is a combined global config with module-specific options
                 #modConfig = deepcopy(self.config)
                 modConfig = self.config['__modules__'][modName]['opts']
-                for opt in self.config.keys():
+                for opt in list(self.config.keys()):
                     modConfig[opt] = self.config[opt]
 
                 mod.clearListeners() # clear any listener relationships from the past
@@ -103,8 +103,8 @@ class SpiderFootScanner:
                 self.sf.status(modName + " module loaded.")
 
             # Register listener modules and then start all modules sequentially
-            for module in self.moduleInstances.values():
-                for listenerModule in self.moduleInstances.values():
+            for module in list(self.moduleInstances.values()):
+                for listenerModule in list(self.moduleInstances.values()):
                     # Careful not to register twice or you will get duplicate events
                     if listenerModule in module._listenerModules:
                         continue
@@ -122,7 +122,7 @@ class SpiderFootScanner:
             dbh.scanEventStore(self.config['__guid__'], rootEvent)
 
             # Start the modules sequentially.
-            for module in self.moduleInstances.values():
+            for module in list(self.moduleInstances.values()):
                 # Check in case the user requested to stop the scan between modules initializing
                 if module.checkForStop():
                     dbh.scanInstanceSet(self.config['__guid__'], status='ABORTING')
@@ -134,7 +134,7 @@ class SpiderFootScanner:
                 module.start()
 
             # Check if any of the modules ended due to being stopped
-            for module in self.moduleInstances.values():
+            for module in list(self.moduleInstances.values()):
                 if module.checkForStop():
                     aborted = True
 

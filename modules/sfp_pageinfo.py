@@ -47,7 +47,7 @@ etc.)"""
         self.baseDomain = target
         self.results = dict()
 
-        for opt in userOpts.keys():
+        for opt in list(userOpts.keys()):
             self.opts[opt] = userOpts[opt]
 
     # What events is this module interested in for input
@@ -74,10 +74,10 @@ etc.)"""
             sf.debug("Not gathering page info for external site " + eventSource)
             return None
 
-        if eventSource not in self.results.keys():
+        if eventSource not in list(self.results.keys()):
             self.results[eventSource] = list()
 
-        for regexpGrp in regexps.keys():
+        for regexpGrp in list(regexps.keys()):
             if regexpGrp in self.results[eventSource]:
                 next
 

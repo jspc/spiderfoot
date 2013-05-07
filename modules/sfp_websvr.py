@@ -34,7 +34,7 @@ class sfp_websvr(SpiderFootPlugin):
         self.baseDomain = target
         self.results = dict()
 
-        for opt in userOpts.keys():
+        for opt in list(userOpts.keys()):
             self.opts[opt] = userOpts[opt]
 
     # What events is this module interested in for input
@@ -50,7 +50,7 @@ class sfp_websvr(SpiderFootPlugin):
         eventSource = event.sourceEvent.data
 
         sf.debug("Received event, " + eventName + ", from " + srcModuleName)
-        if self.results.has_key(eventSource):
+        if eventSource in self.results:
             return None
         else:
             self.results[eventSource] = True
@@ -63,30 +63,30 @@ class sfp_websvr(SpiderFootPlugin):
         # banners and therefore classifying them further (type and version,
         # possibly OS. This could also trigger additional tests, such as 404s
         # and other errors to see what the header looks like.
-        if eventData.has_key('server'):
+        if 'server' in eventData:
             evt = SpiderFootEvent("WEBSERVER_BANNER", eventData['Server'], 
                 self.__name__, parentEvent)
             self.notifyListeners(evt)
 
             sf.info("Found web server: " + eventData['Server'] + " (" + eventSource + ")")
 
-        if (eventData.has_key('x-powered-by')):
+        if ('x-powered-by' in eventData):
             evt = SpiderFootEvent("WEBSERVER_TECHNOLOGY", eventData['x-powered-by'], 
                 self.__name__, parentEvent)
             self.notifyListeners(evt)
             return None
 
         tech = None
-        if eventData.has_key('set-cookie') and 'PHPSESS' in eventData['set-cookie']:
+        if 'set-cookie' in eventData and 'PHPSESS' in eventData['set-cookie']:
             tech = "PHP"
 
-        if eventData.has_key('set-cookie') and 'JSESSIONID' in eventData['set-cookie']:
+        if 'set-cookie' in eventData and 'JSESSIONID' in eventData['set-cookie']:
             tech = "Java/JSP"
 
-        if eventData.has_key('set-cookie') and 'ASP.NET' in eventData['set-cookie']:
+        if 'set-cookie' in eventData and 'ASP.NET' in eventData['set-cookie']:
             tech = "ASP.NET"
 
-        if eventData.has_key('x-aspnet-version'):
+        if 'x-aspnet-version' in eventData:
             tech = "ASP.NET"
 
         if tech != None and '.jsp' in eventSource:

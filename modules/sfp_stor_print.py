@@ -33,7 +33,7 @@ class sfp_stor_print(SpiderFootPlugin):
 
         sf = sfc
 
-        for opt in userOpts.keys():
+        for opt in list(userOpts.keys()):
             self.opts[opt] = userOpts[opt]
 
     # Module description

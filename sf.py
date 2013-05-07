@@ -67,8 +67,8 @@ if __name__ == '__main__':
             if hasattr(sfModules[modName]['object'], 'optdescs'):
                 sfModules[modName]['optdescs'] = sfModules[modName]['object'].optdescs
 
-    if len(sfModules.keys()) < 1:
-        print "No modules found in the modules directory."
+    if len(list(sfModules.keys())) < 1:
+        print("No modules found in the modules directory.")
         sys.exit(-1)
     
     # Add module info to sfConfig so it can be used by the UI
@@ -77,8 +77,8 @@ if __name__ == '__main__':
     sfConfig['__globaloptdescs__'] = sfOptdescs
 
     # Start the web server so you can start looking at results
-    print "Starting web server at http://" + sfConfig['__webaddr'] + \
-        ":" + str(sfConfig['__webport']) + "..."
+    print("Starting web server at http://" + sfConfig['__webaddr'] + \
+        ":" + str(sfConfig['__webport']) + "...")
 
     cherrypy.config.update({
         'server.socket_host': sfConfig['__webaddr'],

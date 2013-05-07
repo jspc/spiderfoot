@@ -14,7 +14,7 @@ import cherrypy
 import cgi
 import os
 import time
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 from copy import deepcopy
 from mako.lookup import TemplateLookup
 from mako.template import Template
@@ -65,15 +65,15 @@ class SpiderFootWebUi:
         dbh = SpiderFootDb(self.config)
         ret['config'] = dbh.scanConfigGet(id)
         ret['configdesc'] = dict()
-        for key in ret['config'].keys():
+        for key in list(ret['config'].keys()):
             if ':' not in key:
                 ret['configdesc'][key] = self.config['__globaloptdescs__'][key]
             else:
                 [ modName, modOpt ] = key.split(':')
-                if not modName in self.config['__modules__'].keys():
+                if not modName in list(self.config['__modules__'].keys()):
                     continue
 
-                if not modOpt in self.config['__modules__'][modName]['optdescs'].keys():
+                if not modOpt in list(self.config['__modules__'][modName]['optdescs'].keys()):
                     continue
 
                 ret['configdesc'][key] = self.config['__modules__'][modName]['optdescs'][modOpt]

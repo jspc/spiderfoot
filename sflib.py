@@ -16,7 +16,7 @@ import re
 import os
 import sys
 import time
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 
 class SpiderFoot:
     dbh = None
@@ -48,7 +48,7 @@ class SpiderFoot:
 
     def error(self, error, exception=True):
         if self.dbh == None:
-            print '[Error] ' + error
+            print('[Error] ' + error)
         else:
             self._dblog("ERROR", error)
         if exception:
@@ -56,7 +56,7 @@ class SpiderFoot:
 
     def fatal(self, error):
         if self.dbh == None:
-            print '[Fatal] ' + error
+            print('[Fatal] ' + error)
         else:
             self._dblog("FATAL", error)
         raise BaseException("Fatal Error Encountered: " + error)
@@ -64,7 +64,7 @@ class SpiderFoot:
 
     def status(self, message):
         if self.dbh == None:
-            print "[Status] " + message
+            print("[Status] " + message)
         else:
             self._dblog("STATUS", message)
 
@@ -78,7 +78,7 @@ class SpiderFoot:
             modName = mod.__name__
 
         if self.dbh == None:
-            print '[' + modName + '] ' + message
+            print('[' + modName + '] ' + message)
         else:
             self._dblog("INFO", message, modName)
         return
@@ -95,7 +95,7 @@ class SpiderFoot:
             modName = mod.__name__
 
         if self.dbh == None:
-            print '[' + modName + '] ' + message
+            print('[' + modName + '] ' + message)
         else:
             self._dblog("DEBUG", message, modName)
         return
@@ -106,9 +106,9 @@ class SpiderFoot:
 
         # Determine whether we've been compiled by py2exe
         if hasattr(sys, "frozen"):
-            return os.path.dirname(unicode(sys.executable, sys.getfilesystemencoding( )))
+            return os.path.dirname(str(sys.executable, sys.getfilesystemencoding( )))
 
-        return os.path.dirname(unicode(__file__, sys.getfilesystemencoding( )))
+        return os.path.dirname(str(__file__, sys.getfilesystemencoding( )))
 
 
     #
@@ -120,7 +120,7 @@ class SpiderFoot:
     def configSerialize(self, opts, filterSystem=True):
         storeopts = dict()
 
-        for opt in opts.keys():
+        for opt in list(opts.keys()):
             # Filter out system temporary variables like GUID and others
             if opt.startswith('__') and filterSystem:
                 continue
@@ -136,7 +136,7 @@ class SpiderFoot:
             if type(opts[opt]) is list:
                 storeopts[opt] = ','.join(opts[opt])
 
-        if not opts.has_key('__modules__'):
+        if '__modules__' not in opts:
             return storeopts
 
         for mod in opts['__modules__']:
@@ -165,11 +165,11 @@ class SpiderFoot:
         returnOpts = referencePoint
 
         # Global options
-        for opt in referencePoint.keys():
+        for opt in list(referencePoint.keys()):
             if opt.startswith('__') and filterSystem:
                 # Leave out system variables
                 continue
-            if opts.has_key(opt):
+            if opt in opts:
                 if type(referencePoint[opt]) is bool:
                     if opts[opt] == "1":
                         returnOpts[opt] = True
@@ -190,7 +190,7 @@ class SpiderFoot:
                     else:
                         returnOpts[opt] = str(opts[opt]).split(",")
 
-        if not referencePoint.has_key('__modules__'):
+        if '__modules__' not in referencePoint:
             return returnOpts
 
         # Module options
@@ -199,7 +199,7 @@ class SpiderFoot:
             for opt in referencePoint['__modules__'][modName]['opts']:
                 if opt.startswith('_') and filterSystem:
                     continue
-                if opts.has_key(modName + ":" + opt):
+                if modName + ":" + opt in opts:
                     if type(referencePoint['__modules__'][modName]['opts'][opt]) is bool:
                         if opts[modName + ":" + opt] == "1":
                             returnOpts['__modules__'][modName]['opts'][opt] = True
@@ -344,7 +344,7 @@ class SpiderFoot:
         try:
             # Because we're working with a big blob of text now, don't worry
             # about clobbering proper links by url decoding them.
-            data = urllib2.unquote(data)
+            data = urllib.parse.unquote(data)
             regRel = re.compile('(.)([a-zA-Z0-9\-\.]+\.'+domain+')', 
                 re.IGNORECASE)
             urlsRel = urlsRel + regRel.findall(data)
@@ -376,7 +376,7 @@ class SpiderFoot:
 
             # URL decode links
             if '%2f' in link.lower():
-                link = urllib2.unquote(link)
+                link = urllib.parse.unquote(link)
 
             # Capture the absolute link:
             # If the link contains ://, it is already an absolute link
@@ -417,39 +417,39 @@ class SpiderFoot:
 
         try:
             header = dict()
-            if self.opts.has_key('_useragent'):
+            if '_useragent' in self.opts:
                 header['User-Agent'] = self.opts['_useragent']
             # Let modules override
-            if self.opts.has_key('useragent'):
+            if 'useragent' in self.opts:
                 header['User-Agent'] = self.opts['useragent']
 
-            if not self.opts.has_key('_fetchtimeout'):
+            if '_fetchtimeout' not in self.opts:
                 self.opts['_fetchtimeout'] = 30
-            req = urllib2.Request(url, None, header)
+            req = urllib.request.Request(url, None, header)
             if cookies != None:
                 req.add_header('cookie', cookies)
                 self.info("Fetching (incl. cookies): " + url)
             else:
                 self.info("Fetching: " + url)
 
-            fullPage = urllib2.urlopen(req, None, self.opts['_fetchtimeout'])
+            fullPage = urllib.request.urlopen(req, None, self.opts['_fetchtimeout'])
 
             # Prepare result to return
-            result['content'] = unicode(fullPage.read(), 'utf-8', errors='replace')
+            result['content'] = str(fullPage.read(), 'utf-8', errors='replace')
             result['headers'] = fullPage.info()
             #print "FOR: " + url
             #print "HEADERS: " + str(result['headers'])
             result['realurl'] = fullPage.geturl()
             result['code'] = fullPage.getcode()
             result['status'] = 'OK'
-        except urllib2.HTTPError as h:
+        except urllib.error.HTTPError as h:
             self.info("HTTP code " + str(h.code) + " encountered for " + url)
             # Capture the HTTP error code
             result['code'] = h.code
             result['headers'] = h.info()
             if fatal:
                 self.fatal('URL could not be fetched (' + h.code + ')')
-        except urllib2.URLError as e:
+        except urllib.error.URLError as e:
             self.info("Error fetching " + url + "(" + str(e) + ")")
             result['status'] = str(e)
             if fatal:
@@ -507,7 +507,7 @@ class SpiderFootPlugin(object):
         if self.checkForStop():
             return None
 
-        if eventData == None or (type(eventData) is unicode and len(eventData) == 0):
+        if eventData == None or (type(eventData) is str and len(eventData) == 0):
             #print "No data to send for " + eventName + " to " + listener.__module__
             return None
 
@@ -588,8 +588,8 @@ class SpiderFootEvent(object):
             return "ROOT"
 
         # Handle lists and dicts
-        if type(self.data) not in [str, unicode]:
-            idString = unicode(self.eventType + str(self.data) + str(self.generated) + self.module, 'utf-8', errors='replace')
+        if type(self.data) not in [str, str]:
+            idString = str(self.eventType + str(self.data) + str(self.generated) + self.module, 'utf-8', errors='replace')
         else:
             idString = self.eventType + self.data + str(self.generated) + self.module
 

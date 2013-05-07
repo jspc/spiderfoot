@@ -232,7 +232,7 @@ class SpiderFootDb:
     # Store the default configuration
     def configSet(self, optMap=dict()):
         qry = "REPLACE INTO tbl_config (scope, opt, val) VALUES (?, ?, ?)"
-        for opt in optMap.keys():
+        for opt in list(optMap.keys()):
             # Module option
             if ":" in opt:
                 parts = opt.split(':')
@@ -280,7 +280,7 @@ class SpiderFootDb:
         qry = "REPLACE INTO tbl_scan_config \
                 (scan_instance_id, component, opt, val) VALUES (?, ?, ?, ?)"
 
-        for opt in optMap.keys():
+        for opt in list(optMap.keys()):
             # Module option
             if ":" in opt:
                 parts = opt.split(':')

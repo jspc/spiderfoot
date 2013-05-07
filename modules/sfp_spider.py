@@ -75,14 +75,14 @@ class sfp_spider(SpiderFootPlugin):
         self.urlEvents = dict()
         self.siteCookies = dict()
 
-        for opt in userOpts.keys():
+        for opt in list(userOpts.keys()):
             self.opts[opt] = userOpts[opt]
 
     # Fetch data from a URL and obtain all links that should be followed
     def processUrl(self, url):
         site = sf.urlFQDN(url)
         cookies = None
-        if self.siteCookies.has_key(site):
+        if site in self.siteCookies:
             sf.debug("Restoring cookies for " + site + ": " + str(self.siteCookies[site]))
             cookies = self.siteCookies[site]
         # Fetch the contents of the supplied URL (object returned)
@@ -95,7 +95,7 @@ class sfp_spider(SpiderFootPlugin):
                 self.siteCookies[site] = fetched['headers'].get('Set-Cookie')
                 sf.debug("Saving cookies for " + site + ": " + str(self.siteCookies[site]))
 
-        if not self.urlEvents.has_key(url):
+        if url not in self.urlEvents:
             self.urlEvents[url] = None
 
         # Notify modules about the content obtained
@@ -131,7 +131,7 @@ class sfp_spider(SpiderFootPlugin):
     def cleanLinks(self, links):
         returnLinks = dict()
 
-        for link in links.keys():
+        for link in list(links.keys()):
             linkBase = sf.urlBaseUrl(link)
 
             # Optionally skip external sites (typical behaviour..)
@@ -151,13 +151,13 @@ class sfp_spider(SpiderFootPlugin):
 
             # If we are respecting robots.txt, filter those out too
             checkRobots = lambda blocked: str.lower(blocked) in str.lower(str(link)) or blocked == '*'
-            if self.opts['robotsonly'] and filter(checkRobots, self.robotsRules[linkBase]):
+            if self.opts['robotsonly'] and list(filter(checkRobots, self.robotsRules[linkBase])):
                 sf.debug("Ignoring page found in robots.txt: " + link)
                 continue
 
             # Filter out certain file types (if user chooses to)
             checkExts = lambda ext: '.' + str.lower(ext) in str.lower(str(link))
-            if filter(checkExts, self.opts['filterfiles']):
+            if list(filter(checkExts, self.opts['filterfiles'])):
                 sf.debug('Ignoring filtered extension: ' + link)
                 continue
 
@@ -213,7 +213,7 @@ class sfp_spider(SpiderFootPlugin):
 
         sf.debug("Received event, " + eventName + ", from " + srcModuleName)
 
-        if eventData in self.urlEvents.keys():
+        if eventData in list(self.urlEvents.keys()):
             sf.debug("Ignoring " + eventData + " as already spidered or is being spidered.")           
             return None
         else:
@@ -247,7 +247,7 @@ class sfp_spider(SpiderFootPlugin):
         targetBase = sf.urlBaseUrl(startingPoint)
 
         # Are we respecting robots.txt?
-        if self.opts['robotsonly'] and not self.robotsRules.has_key(targetBase):
+        if self.opts['robotsonly'] and targetBase not in self.robotsRules:
             robotsTxt = sf.fetchUrl(targetBase + '/robots.txt')
             if robotsTxt['content'] != None:
                 sf.debug('robots.txt contents: ' + robotsTxt['content'])
@@ -273,9 +273,9 @@ class sfp_spider(SpiderFootPlugin):
                 links = dict()
 
                 # Fetch content from the new links
-                for link in nextLinks.keys():
+                for link in list(nextLinks.keys()):
                     # Always skip links we've already fetched
-                    if (link in self.fetchedPages.keys()):
+                    if (link in list(self.fetchedPages.keys())):
                         sf.debug("Already fetched " + link + ", skipping.")
                         continue
 

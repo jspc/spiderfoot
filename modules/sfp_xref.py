@@ -54,7 +54,7 @@ class sfp_xref(SpiderFootPlugin):
         self.results = dict()
         self.fetched = list()
 
-        for opt in userOpts.keys():
+        for opt in list(userOpts.keys()):
             self.opts[opt] = userOpts[opt]
 
     # What events is this module interested in for input
@@ -117,7 +117,7 @@ class sfp_xref(SpiderFootPlugin):
                 return None
 
         if len(matches) > 0:
-            if self.results.has_key(url):
+            if url in self.results:
                 return None
 
             self.results[url] = True
