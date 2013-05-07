@@ -106,9 +106,9 @@ class SpiderFoot:
 
         # Determine whether we've been compiled by py2exe
         if hasattr(sys, "frozen"):
-            return os.path.dirname(str(sys.executable, sys.getfilesystemencoding( )))
+            return os.path.dirname(str(sys.executable))
 
-        return os.path.dirname(str(__file__, sys.getfilesystemencoding( )))
+        return os.path.dirname(str(__file__))
 
 
     #
