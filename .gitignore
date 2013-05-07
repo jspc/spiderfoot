@@ -4,3 +4,8 @@
 
 # Vi(m) files
 *.swp
+
+# Arbitraty files
+*.bak
+*.tmp
+
