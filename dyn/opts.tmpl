@@ -71,7 +71,7 @@
     % for opt in opts['__modules__'][mod]['opts'].keys():
         % if not opt.startswith("_"):
             <%
-            if not opts['__modules__'][mod].has_key('optdescs'):
+            if not 'optdescs' in opts['__modules__'][mod]:
                 optdesc = "No description available."
             else:
                 optdesc = opts['__modules__'][mod]['optdescs'][opt]
